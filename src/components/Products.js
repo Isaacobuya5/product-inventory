@@ -15,26 +15,76 @@ var PRODUCTS = {
 class Products extends React.Component {
   constructor(props) {
     super(props);
+    this.changeFilterText = this.changeFilterText.bind(this);
+    this.checkStock = this.checkStock.bind(this);
+    this.saveProduct = this.saveProduct.bind(this);
+    this.handleDestroy = this.handleDestroy.bind(this);
     this.state = {
-      filterText: 'C',
+      filterText: '',
       inStockOnly: false,
       products: PRODUCTS
-    };
 
   }
+}
+
+  // add new products
+  saveProduct(product) {
+    if (!product.id) {
+      product.id = new Date().getTime();
+    }
+    this.setState((prevState) => {
+      let products = prevState.products;
+      products[product.id] = product;
+      console.log({ products })
+      return { products };
+    });
+  }
+
+    //deleting a product using specific id
+    handleDestroy(productId) {
+      this.setState((prevState) => {
+        let products = prevState.products;
+        delete products[productId];
+        return { products };
+      });
+    }
+
+  //capture new filter text
+  changeFilterText(e) {
+    this.setState(({
+      filterText: e.target.value
+    }))
+  }
+
+    //show only products in stock
+    checkStock(e) {
+      this.setState(({
+        inStockOnly: e.target.checked
+      }))
+    }
+
+
+
+
+
   render() {
     return (
       <div>
         <Filters
           filterText={this.state.filterText}
           inStockOnly={this.state.inStockOnly}
+          myFilters={this.changeFilterText}
+          showStock={this.checkStock}
         ></Filters>
         <ProductTable
           products={this.state.products}
           filterText={this.state.filterText}
           inStockOnly={this.state.inStockOnly}
+          onDestroy={this.handleDestroy}
         ></ProductTable>
-        <ProductForm ></ProductForm>
+        <ProductForm 
+          onSave={this.saveProduct}
+        />
       </div>
     );
   }
